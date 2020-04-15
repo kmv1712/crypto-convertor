@@ -1,0 +1,3 @@
+npx create-react-app crypto-converter --typescript
+
+npm install @material-ui/core
