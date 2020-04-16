@@ -1,3 +1,5 @@
+проект по урокам Archakov Denis крипто конвертер
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
