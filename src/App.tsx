@@ -42,6 +42,11 @@ const useStyles = makeStyles((theme: Theme) =>
     table: {
       minWidth: 650,
     },
+    currencyIcon: {
+      width: 18,
+      height: 18,
+      borderRadius: 30,
+    },
   }),
 );
 
@@ -49,19 +54,30 @@ const useStyles = makeStyles((theme: Theme) =>
 type TCoin = {
   name: string;
   fullName: string;
-  imgUrl: string;
+  imageUrl: string;
   price: number;
-  volume24Houre: number;
+  volume24Hour: number;
 }
 
 
 function App() {
   const classes = useStyles();
-  const [allCoins, setAllCoins] = React.useState<TCoin[] | null>(null);
+  const [allCoins, setAllCoins] = React.useState<TCoin[]>([]);
 
   React.useEffect(() => {
-    axios.get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD').then(({ data }) => {
-      const coins = data.Data;
+    axios
+    .get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD')
+    .then(({ data }) => {
+      const coins: TCoin[] = data.Date.map((coin: any) => {
+        const obj: TCoin = {
+          name: coin.CoinInfo.Name,
+          fullName: coin.CoinInfo.FullName,
+          imageUrl: `https://www.cryptocompare.com/${coin.CoinInfo.ImageUrl}`,
+          price: coin.RAW.USD.toFixed(3),
+          volume24Hour: coin.RAW.USD.VOLUME24HOUR
+        }
+        return obj;
+      });
       setAllCoins(coins);
     });
   }, [classes]);
@@ -76,23 +92,21 @@ function App() {
                 <TableHead>
                   <TableRow>
                     <TableCell></TableCell>
-                    <TableCell align="right">FullName</TableCell>
-                    <TableCell align="right">Name</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">volume24houre</TableCell>
+                    <TableCell align="left">FullName</TableCell>
+                    <TableCell align="left">Name</TableCell>
+                    <TableCell align="left">Price</TableCell>
+                    <TableCell align="left">volume24houre</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {allCoins.map(row => (
-                    <TableRow key={row.name}>
-                      <TableCell component="th" scope="row">
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="right">{row.name}</TableCell>
-                      <TableCell align="right">{row.fullName}</TableCell>
-                      <TableCell align="right">{row.imgUrl}</TableCell>
-                      <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right">{row.volume24Houre}</TableCell>
+                  {allCoins.map(coin => (
+                    <TableRow key={coin.name}>
+                      <TableCell className={classes.currencyIcon}><img src={coin.imageUrl} alt="Coin icon"/></TableCell>
+                      <TableCell align="left">{coin.name}</TableCell>
+                      <TableCell align="left">{coin.fullName}</TableCell>
+                      <TableCell align="left">{coin.imageUrl}</TableCell>
+                      <TableCell align="left">{coin.price}</TableCell>
+                      <TableCell align="left">{coin.volume24Hour}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
