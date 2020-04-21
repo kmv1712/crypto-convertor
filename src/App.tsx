@@ -16,7 +16,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-
+import { TCoin } from './types';
+import { CryptoTable } from './components';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,35 +52,26 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 
-type TCoin = {
-  name: string;
-  fullName: string;
-  imageUrl: string;
-  price: number;
-  volume24Hour: number;
-}
-
-
 function App() {
   const classes = useStyles();
   const [allCoins, setAllCoins] = React.useState<TCoin[]>([]);
 
   React.useEffect(() => {
     axios
-    .get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD')
-    .then(({ data }) => {
-      const coins: TCoin[] = data.Date.map((coin: any) => {
-        const obj: TCoin = {
-          name: coin.CoinInfo.Name,
-          fullName: coin.CoinInfo.FullName,
-          imageUrl: `https://www.cryptocompare.com/${coin.CoinInfo.ImageUrl}`,
-          price: coin.RAW.USD.toFixed(3),
-          volume24Hour: coin.RAW.USD.VOLUME24HOUR
-        }
-        return obj;
+      .get('https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD')
+      .then(({ data }) => {
+        const coins: TCoin[] = data.Date.map((coin: any) => {
+          const obj: TCoin = {
+            name: coin.CoinInfo.Name,
+            fullName: coin.CoinInfo.FullName,
+            imageUrl: `https://www.cryptocompare.com/${coin.CoinInfo.ImageUrl}`,
+            price: coin.RAW.USD.toFixed(3),
+            volume24Hour: coin.RAW.USD.VOLUME24HOUR
+          }
+          return obj;
+        });
+        setAllCoins(coins);
       });
-      setAllCoins(coins);
-    });
   }, [classes]);
 
   return (
@@ -87,31 +79,8 @@ function App() {
       <Grid container className={classes.root} spacing={3}>
         <Grid item xs={8}>
           <Paper>
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell></TableCell>
-                    <TableCell align="left">FullName</TableCell>
-                    <TableCell align="left">Name</TableCell>
-                    <TableCell align="left">Price</TableCell>
-                    <TableCell align="left">volume24houre</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {allCoins.map(coin => (
-                    <TableRow key={coin.name}>
-                      <TableCell className={classes.currencyIcon}><img src={coin.imageUrl} alt="Coin icon"/></TableCell>
-                      <TableCell align="left">{coin.name}</TableCell>
-                      <TableCell align="left">{coin.fullName}</TableCell>
-                      <TableCell align="left">{coin.imageUrl}</TableCell>
-                      <TableCell align="left">{coin.price}</TableCell>
-                      <TableCell align="left">{coin.volume24Hour}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer></Paper >
+            <CryptoTable classes={classes} items={allCoins} />
+          </Paper >
         </Grid>
         <Grid item xs={4}>
           <Paper className={classes.paper}>
@@ -142,7 +111,6 @@ function App() {
                   <MenuItem value={30}>Thety</MenuItem>
                 </Select>
               </FormControl>
-              <Typography variant="h5" component="h5"> 77,81 российский рубль</Typography>
             </div>
           </Paper >
         </Grid>
